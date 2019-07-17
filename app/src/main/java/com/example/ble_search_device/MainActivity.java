@@ -40,14 +40,14 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> deviceName;
     private boolean mScanning = false;
 
-    private BluetoothManager bluetoothManager;
-    private BluetoothAdapter bluetoothAdapter;
+    private BluetoothManager bluetoothManager = null;
+    private BluetoothAdapter bluetoothAdapter = null;
     private static final int REQUEST_ENABLE_BT = 1;
     private static final int SCAN_TIME = 10000;
     private ArrayList<BluetoothDevice> bluetoothDevices = new ArrayList<BluetoothDevice>();
     private Handler handler;
 
-    BluetoothLeScanner bluetoothLeScanner;
+    private BluetoothLeScanner bluetoothLeScanner = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,18 +77,27 @@ public class MainActivity extends AppCompatActivity {
         if(!getPackageManager().hasSystemFeature(getPackageManager().FEATURE_BLUETOOTH_LE)){
             Toast.makeText(getBaseContext(), "No Support BLE", Toast.LENGTH_LONG).show();
             finish();
+            return;
         }
 
         bluetoothManager = (BluetoothManager) this.getSystemService(BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
 
         if(bluetoothAdapter == null){
+            Toast.makeText(getBaseContext(), "Bluetooth Not Support", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+        else if(bluetoothAdapter.isEnabled() == false){
             Toast.makeText(getBaseContext(), "Please Open Bluetooth", Toast.LENGTH_SHORT).show();
             Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBluetooth, REQUEST_ENABLE_BT);
         }
 
+        bluetoothManager = (BluetoothManager) this.getSystemService(BLUETOOTH_SERVICE);
+        bluetoothAdapter = bluetoothManager.getAdapter();
         bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             // Android M Permission check 
@@ -124,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(enableBluetooth, REQUEST_ENABLE_BT);
             Log.v("MainActivity","Enable_start");
         }
-        ScanFunction(true);
+        //ScanFunction(true);
 
         Log.v("MainActivity", "onResume_End");
     }
@@ -161,7 +170,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void ScanFunction(boolean enable){
         Log.v("MainActivity", "ScanFunction_Start");
-
+        bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
 
         if(enable){
             Log.v("MainActivity", "mScanning");
@@ -193,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause(){
         super.onPause();
         Log.v("MainActivity", "OnPause(): Stop Scan");
-        bluetoothLeScanner.stopScan(scanCallback);
+        //bluetoothLeScanner.stopScan(scanCallback);
     }
 
     private class onItemClickLister implements AdapterView.OnItemClickListener{
