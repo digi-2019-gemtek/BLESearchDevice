@@ -138,14 +138,18 @@ public class MainActivity extends AppCompatActivity {
         Log.v("MainActivity", "onResume_End");
     }
 
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         Log.v("MainActivity", "onActivityResult_Start");
-        if(REQUEST_ENABLE_BT == 1 && resultCode == Activity.RESULT_CANCELED){
-            Log.e("MainActivity", "OnActivityResult_Canceled");
-            finish();
-            return;
+        if(requestCode == REQUEST_ENABLE_BT){ // 2019.07.17 Jerry: Is bluetooth already enabled
+            if(resultCode == RESULT_OK){
+                Toast.makeText(getBaseContext(), "Bluetooth is now Enabled", Toast.LENGTH_SHORT).show();
+            }
+            else if(resultCode == RESULT_CANCELED){ // 2019.07.17 Jerry: if not, App will be shutdown in 1 second.
+                Toast.makeText(getBaseContext(), "App will be shutdown in 1 second", Toast.LENGTH_SHORT).show();
+                finish();
+            }
         }
-        super.onActivityResult(requestCode, resultCode, data);
         Log.v("MainActivity", "onActivityResult_End");
     }
 
